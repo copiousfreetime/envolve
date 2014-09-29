@@ -27,4 +27,9 @@ class TestConfig < ::Minitest::Test
   def test_keys
     assert_equal( [ 'ev_test_1', 'ev_test_2'], @config.keys.sort )
   end
+
+
+  def test_access
+    assert_equal( 'test-2', @config['ev_test_2'] )
+  end
 end
