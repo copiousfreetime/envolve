@@ -7,11 +7,14 @@ module Envolve
   # You can also tell it to only pull those items from the initial has that have
   # a particular prefix
   class Config
+    DEFAULT_KEY_SEPARATOR = '_'.freeze
+
     # Internal: The internal hash holding all the keys and values
     attr_reader :env
 
     # Public: Create a new Config
-    def initialize( env = ENV )
+    def initialize( env: ENV, prefix: nil, key_separator: DEFAULT_KEY_SEPARATOR )
+      @key_separator = key_separator
       @env = downcase_keys( env )
     end
 

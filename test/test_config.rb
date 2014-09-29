@@ -8,9 +8,8 @@ class TestConfig < ::Minitest::Test
   end
 
   def setup
-    @config = Envolve::Config.new( env )
+    @config = Envolve::Config.new( env: env )
   end
-
 
   def test_access_key_as_method
     assert_equal( 'test-1', @config.ev_test_1 )
@@ -32,4 +31,5 @@ class TestConfig < ::Minitest::Test
   def test_access
     assert_equal( 'test-2', @config['ev_test_2'] )
   end
+
 end
