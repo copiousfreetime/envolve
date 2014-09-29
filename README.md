@@ -2,7 +2,6 @@
 
 * [Homepage](https://github.com/copiousfreetime/envolve/)
 * [Github Project](https://github.com/copiousfreetime/envolve)
-* email jeremy at hinegardner dot org
 
 ## DESCRIPTION
 
