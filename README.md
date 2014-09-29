@@ -6,7 +6,11 @@
 
 ## DESCRIPTION
 
- envolve
+Envolve provides a consistent and validating way to access your application
+configuration that is set via environment variables.
+
+This is double beneficial if you are configuring your entire application with
+environment variables. See. http://12factor.net/config
 
 ## FEATURES
 
