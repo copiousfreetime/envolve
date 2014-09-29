@@ -12,10 +12,20 @@ module Envolve
     # Internal: The internal hash holding all the keys and values
     attr_reader :env
 
+    # Internal: The prefix to strip off all the keys
+    attr_reader :prefix
+
+    # Internal: The character to use as the key separator
+    attr_reader :key_separator
+
     # Public: Create a new Config
     def initialize( env: ENV, prefix: nil, key_separator: DEFAULT_KEY_SEPARATOR )
       @key_separator = key_separator
       @env = downcase_keys( env )
+      if @prefix = prefix then
+        @prefix = @prefix.to_s.downcase.strip
+        @env    = filter_by_prefix( @env, @prefix )
+      end
     end
 
     # Public: The number of elements in the config
@@ -58,21 +68,42 @@ module Envolve
       env.has_key?( symbol.to_s ) || super
     end
 
+    # Internal: The prefix regular expression used for stripping leading prefix
+    #
+    # This matches Beginning of String followed by the prefix followed by 0 or
+    # more key_separator characters.
+    #
+    # This will use named captures. The prefix will be under key 'prefix' and
+    # the following will be under 'rest'
+    #
+    # Returns the regex
+    def prefix_regex( prefix, key_separator )
+      /\A(?<prefix>#{prefix}[#{key_separator}]*)(?<rest>.*)\Z/i
+    end
+
 
     private
 
-    def downcase_keys( in_hash )
+    # Return a copy of the hash filtered by the prefix.
+    #
+    # All the keys that match the prefix will have hte prefix stripped off. All
+    # others will be ignored
+    def filter_by_prefix( in_hash, pre = prefix, ks = key_separator )
       out_hash = {}
+      matcher  = prefix_regex( pre, ks )
       in_hash.each do |key, value|
-        out_hash[key.downcase] = value
+        if md = matcher.match( key ) then
+          out_hash[ md[:rest] ] = value
+        end
       end
       return out_hash
     end
 
-    def symbolize_keys( in_hash )
+    # Return a copy of the hash with all the keys downcased
+    def downcase_keys( in_hash )
       out_hash = {}
       in_hash.each do |key, value|
-        out_hash[key.to_sym] = value
+        out_hash[key.downcase] = value
       end
       return out_hash
     end
