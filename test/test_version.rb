@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'envolve'
+require 'envolve/version'
 
 class TestVersion < ::Minitest::Test
   def test_version_constant_match
