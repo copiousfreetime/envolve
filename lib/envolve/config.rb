@@ -94,6 +94,23 @@ module Envolve
       env[key]
     end
 
+    # Public: Return a subset of the config with just those items that have a
+    # prefix on them
+    #
+    # The resulting Config only has those keys, and all with the prefixes
+    # stripped
+    def config_with_prefix( prefix )
+      self.class.new( env: env, prefix: prefix )
+    end
+
+    # Public: Return as hash of the keys and values
+    #
+    # Returns a Hash
+    def to_h
+      env.to_h.dup
+    end
+    alias to_hash to_h
+
     # Internal: This is how we convert method calls into key lookups in the
     # internal hash.
     def method_missing( method, *args, &block )
