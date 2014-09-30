@@ -1,5 +1,5 @@
 # Envolve Changelog
-## Version x.y.z
+## Version 1.0.0
 
 * Initial Release - Yeah!
 
