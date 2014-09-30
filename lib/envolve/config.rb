@@ -75,30 +75,31 @@ module Envolve
     end
 
     # Internal: The internal hash holding all the keys and values
-    attr_reader :env
+    attr_reader :_env
 
     # Internal: The prefix to strip off all the keys
-    attr_reader :prefix
+    attr_reader :_prefix
 
     # Internal: The character to use as the key separator
-    attr_reader :key_separator
+    attr_reader :_key_separator
 
     # Public: Create a new Config
     def initialize( env: self.class.environment_source, prefix: self.class.prefix,
                    key_separator: self.class.key_separator )
-      @key_separator = key_separator
-      @prefix        = prefix.nil? ? nil : prefix.to_s.downcase.strip
-      @env           = process_env( env )
+      @_key_separator = key_separator
+      @_prefix        = prefix.nil? ? nil : prefix.to_s.downcase.strip
+      @_env           = process_env( env )
 
     end
+
 
     # Internal: Process and Transform the keys and values from the environment
     # into the final hash
     #
     def process_env( env )
       env = downcase_keys( env )
-      if prefix then
-        env = filter_by_prefix( env, prefix )
+      if _prefix then
+        env = filter_by_prefix( env, _prefix )
       end
       env = apply_transformations( env, self.class.transformations )
     end
@@ -131,14 +132,14 @@ module Envolve
     #
     # Returns the number of elements
     def size
-      env.size
+      _env.size
     end
 
     # Public: Just the keys, only the keys, as Strings
     #
     # Returns an Array of the keys as Strings
     def keys
-      env.keys
+      _env.keys
     end
 
     # Public: return the value for the give key
@@ -147,7 +148,7 @@ module Envolve
     #
     # Returns value or nil if no value is found
     def []( key )
-      env[key]
+      _env[key]
     end
 
     # Public: Return a subset of the config with just those items that have a
@@ -156,14 +157,14 @@ module Envolve
     # The resulting Config only has those keys, and all with the prefixes
     # stripped
     def config_with_prefix( prefix )
-      self.class.new( env: env, prefix: prefix )
+      self.class.new( env: _env, prefix: prefix )
     end
 
     # Public: Return as hash of the keys and values
     #
     # Returns a Hash
     def to_h
-      env.to_h.dup
+      _env.to_h.dup
     end
     alias to_hash to_h
 
@@ -172,7 +173,7 @@ module Envolve
     # Returns a Hash
     def to_symbolized_h
       h = {}
-      env.each do |key, value|
+      _env.each do |key, value|
         h[key.to_sym] = value
       end
       return h
@@ -183,8 +184,8 @@ module Envolve
     # internal hash.
     def method_missing( method, *args, &block )
       s_method = method.to_s
-      if env.has_key?( s_method ) then
-        env[ s_method ]
+      if _env.has_key?( s_method ) then
+        _env[ s_method ]
       else
         super
       end
@@ -193,7 +194,7 @@ module Envolve
     # Internal: Respond to missing should always be implemented if you implement
     # method_missing
     def respond_to_missing?( symbol, include_all = false )
-      env.has_key?( symbol.to_s ) || super
+      _env.has_key?( symbol.to_s ) || super
     end
 
     # Internal: The prefix regular expression used for stripping leading prefix
@@ -216,7 +217,7 @@ module Envolve
     #
     # All the keys that match the prefix will have hte prefix stripped off. All
     # others will be ignored
-    def filter_by_prefix( in_hash, pre = self.prefix, ks = self.key_separator )
+    def filter_by_prefix( in_hash, pre = _prefix, ks = _key_separator )
       out_hash = {}
       matcher  = prefix_regex( pre, ks )
       in_hash.each do |key, value|
