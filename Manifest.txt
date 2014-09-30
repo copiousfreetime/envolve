@@ -5,8 +5,15 @@ Manifest.txt
 README.md
 Rakefile
 lib/envolve.rb
+lib/envolve/config.rb
 lib/envolve/version.rb
 tasks/default.rake
 tasks/this.rb
+test/test_config.rb
+test/test_filtered_config.rb
 test/test_helper.rb
+test/test_key_separator_config.rb
+test/test_meta_config.rb
+test/test_prefix_config.rb
+test/test_transform_config.rb
 test/test_version.rb
