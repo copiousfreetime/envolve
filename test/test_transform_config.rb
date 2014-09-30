@@ -15,6 +15,7 @@ class TransformedConfig < ::Envolve::Config
 
   transform 'foo', :key => 'bar'
   transform 'wibble', :value => lambda { |val| val.gsub('o', 'ee') }
+  transform 'ara', :default => 42, :value => lambda { |val| Integer(val) }
 
 end
 
@@ -37,12 +38,16 @@ class TestTransformedConfig < ::Minitest::Test
   end
 
   def test_keys
-    keys = %w[ test_1 test_2 bar wibble ].sort
+    keys = %w[ test_1 test_2 bar wibble ara].sort
     assert_equal( keys, @config.keys.sort )
   end
 
   def test_access
     assert_equal( 'weebble', @config['wibble'] )
+  end
+
+  def test_defaults
+    assert_equal( 42, @config['ara'] )
   end
 
 end

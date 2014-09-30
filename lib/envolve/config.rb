@@ -63,8 +63,8 @@ module Envolve
     # is given then the original key or value (respectively) is passed into the
     # lambda.
     #
-    def self.transform( env_var, key: nil, value: nil )
-      transformations[env_var] = { :key => key, :value => value }
+    def self.transform( env_var, key: nil, value: nil, default: nil )
+      transformations[env_var] = { :key => key, :value => value, :default => default }
     end
 
     # Internal: Return the hash holding the transformations
@@ -108,15 +108,19 @@ module Envolve
     #
     # Returns the transformed hash
     def apply_transformations( env, transformations )
-      Hash.new.tap do |transformed|
-        env.each do |key, value|
-          if trans = transformations[key] then
-            key   = apply_transformation(key, trans[:key]) if trans[:key]
-            value = apply_transformation(value, trans[:value]) if trans[:value]
-          end
-          transformed[key] = value
+      transformed = env.to_h.dup
+
+      transformations.each do |key, trans|
+        if value = transformed.delete(key) then
+          key   = apply_transformation(key, trans[:key])     if trans[:key]
+          value = apply_transformation(value, trans[:value]) if trans[:value]
+        elsif value.nil? then
+          value = trans[:default] if trans[:default]
         end
+        transformed[key] = value
       end
+
+      return transformed
     end
 
     # Internal: Apply the given transformation to the input.
