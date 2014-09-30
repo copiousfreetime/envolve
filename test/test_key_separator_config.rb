@@ -6,7 +6,7 @@ class KeySeparatorConfig < Envolve::Config
   environment_source {
     { 'EV-TEST-1' => 'test-1', 'EV-TEST-2' => 'test-2' } 
   }
-  key_separator '-' 
+  key_separator '-'
 end
 
 class TestKeySeparatorConfig < ::TestConfig

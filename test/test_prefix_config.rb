@@ -13,7 +13,6 @@ class PrefixConfig < Envolve::Config
   environment_source( env )
   prefix 'ev_x'
 end
-
 class TestPrefixConfig < TestFilteredConfig
   def setup
     @config = PrefixConfig.new
