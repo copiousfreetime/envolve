@@ -47,6 +47,33 @@ module Envolve
       @_key_separator
     end
 
+    # Public: Set a transformation
+    #
+    # In the conversion of a the environment to the configuration properties
+    # sometimes the keys and/or values need to be converted to a new name.
+    #
+    # All transformations take place AFTER the initial keys have been downcased
+    # and prefix stripped.
+    #
+    # env_var - the environment varaible you want to perform transformations on.
+    # key     - the new key for this environment variable
+    # val     - the new value for this environment varaible.
+    #
+    # Both `key` and `value` can be direct string maps, or lambdas. If a lambda
+    # is given then the original key or value (respectively) is passed into the
+    # lambda.
+    #
+    def self.transform( env_var, key: nil, value: nil )
+      transformations[env_var] = { :key => key, :value => value }
+    end
+
+    # Internal: Return the hash holding the transformations
+    #
+    # Returns Hash
+    def self.transformations
+      @_transformations ||= Hash.new
+    end
+
     # Internal: The internal hash holding all the keys and values
     attr_reader :env
 
@@ -60,11 +87,44 @@ module Envolve
     def initialize( env: self.class.environment_source, prefix: self.class.prefix,
                    key_separator: self.class.key_separator )
       @key_separator = key_separator
-      @env = downcase_keys( env )
-      if @prefix = prefix then
-        @prefix = @prefix.to_s.downcase.strip
-        @env    = filter_by_prefix( @env, @prefix )
+      @prefix        = prefix.nil? ? nil : prefix.to_s.downcase.strip
+      @env           = process_env( env )
+
+    end
+
+    # Internal: Process and Transform the keys and values from the environment
+    # into the final hash
+    #
+    def process_env( env )
+      env = downcase_keys( env )
+      if prefix then
+        env = filter_by_prefix( env, prefix )
       end
+      env = apply_transformations( env, self.class.transformations )
+    end
+
+    # Internal: Apply the give transformations to the hash input
+    #
+    # Returns the transformed hash
+    def apply_transformations( env, transformations )
+      Hash.new.tap do |transformed|
+        env.each do |key, value|
+          if trans = transformations[key] then
+            key   = apply_transformation(key, trans[:key]) if trans[:key]
+            value = apply_transformation(value, trans[:value]) if trans[:value]
+          end
+          transformed[key] = value
+        end
+      end
+    end
+
+    # Internal: Apply the given transformation to the input.
+    #
+    # Returns the result of the transformation
+    def apply_transformation( input, transformer )
+      return input                     if transformer.nil?
+      return transformer.call( input ) if transformer.respond_to?( :call )
+      return transformer
     end
 
     # Public: The number of elements in the config
