@@ -11,6 +11,25 @@ configuration that is set via environment variables.
 This is double beneficial if you are configuring your entire application with
 environment variables. See. http://12factor.net/config
 
+## USAGE
+
+    module MyApp
+      class MyConfig < ::Envolve::Config
+        prefix 'my_app'
+      end
+
+
+      def self.config
+        @config ||= MyConfig.new
+      end
+    end
+
+
+    # deep in some code somewhere
+
+    hostname = MyApp.config.hostname  # which was originall from ENV['MY_APP_HOSTNAME']
+
+
 ## FEATURES
 
   envolve
