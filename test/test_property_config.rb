@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'envolve/config'
 
-class TransformedConfig < ::Envolve::Config
+class PropertyConfig < ::Envolve::Config
   environment_source {
     {
       'EV_TEST_1' => 'test-1',
@@ -13,15 +13,15 @@ class TransformedConfig < ::Envolve::Config
 
   prefix 'ev'
 
-  transform 'foo', :key => 'bar'
-  transform 'wibble', :value => lambda { |val| val.gsub('o', 'ee') }
-  transform 'ara', :default => 42, :value => lambda { |val| Integer(val) }
+  property 'bar',    :key => 'foo'
+  property 'wibble', :value => lambda { |val| val.gsub('o', 'ee') }
+  property 'ara',    :default => 42, :value => lambda { |val| Integer(val) }
 
 end
 
-class TestTransformedConfig < ::Minitest::Test
+class TestPropertyConfig < ::Minitest::Test
   def setup
-    @config = TransformedConfig.new
+    @config = PropertyConfig.new
   end
 
 

@@ -15,5 +15,5 @@ test/test_helper.rb
 test/test_key_separator_config.rb
 test/test_meta_config.rb
 test/test_prefix_config.rb
-test/test_transform_config.rb
+test/test_property_config.rb
 test/test_version.rb

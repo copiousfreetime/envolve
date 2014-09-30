@@ -47,31 +47,31 @@ module Envolve
       @_key_separator
     end
 
-    # Public: Set a transformation
+    # Public: Set a property, with possible transformations
     #
     # In the conversion of a the environment to the configuration properties
     # sometimes the keys and/or values need to be converted to a new name.
     #
-    # All transformations take place AFTER the initial keys have been downcased
+    # All property transformations take place AFTER the initial keys have been downcased
     # and prefix stripped.
     #
-    # env_var - the environment varaible you want to perform transformations on.
-    # key     - the new key for this environment variable
-    # val     - the new value for this environment varaible.
+    # property - the name of the property we want to appear in the configuration
+    # key      - the source key from the environment where this property comes from
+    # value    - the new value for this property
+    # default  - setting a default for this property should it not exist
     #
-    # Both `key` and `value` can be direct string maps, or lambdas. If a lambda
-    # is given then the original key or value (respectively) is passed into the
-    # lambda.
+    # value may also be a lambda, in which ase the lambda is given the original
+    # value and the return value from the labmda is used for the new value.
     #
-    def self.transform( env_var, key: nil, value: nil, default: nil )
-      transformations[env_var] = { :key => key, :value => value, :default => default }
+    def self.property( property, key: nil, value: nil, default: nil )
+      properties[property] = { :key => key, :value => value, :default => default }
     end
 
-    # Internal: Return the hash holding the transformations
+    # Internal: Return the hash holding the properties
     #
     # Returns Hash
-    def self.transformations
-      @_transformations ||= Hash.new
+    def self.properties
+      @_properties ||= Hash.new
     end
 
     # Internal: The internal hash holding all the keys and values
@@ -101,23 +101,24 @@ module Envolve
       if _prefix then
         env = filter_by_prefix( env, _prefix )
       end
-      env = apply_transformations( env, self.class.transformations )
+      env = transform_properties( env, self.class.properties )
     end
 
-    # Internal: Apply the give transformations to the hash input
+    # Internal: Transform the environment variables to propreties
     #
     # Returns the transformed hash
-    def apply_transformations( env, transformations )
+    def transform_properties( env, properties )
       transformed = env.to_h.dup
 
-      transformations.each do |key, trans|
-        if value = transformed.delete(key) then
-          key   = apply_transformation(key, trans[:key])     if trans[:key]
+      properties.each do |dest_key, trans|
+        src_key = trans[:key]
+        src_key ||= dest_key
+        if value = transformed.delete(src_key) then
           value = apply_transformation(value, trans[:value]) if trans[:value]
         elsif value.nil? then
           value = trans[:default] if trans[:default]
         end
-        transformed[key] = value
+        transformed[dest_key] = value
       end
 
       return transformed
