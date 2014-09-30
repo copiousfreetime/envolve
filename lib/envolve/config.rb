@@ -25,11 +25,9 @@ module Envolve
     #
     # Override this to return a different prefix, or meta program it in an
     # inherited class.
-    def self.prefix( *args, &block )
+    def self.prefix( *args )
       if args.size > 0 then
         @_prefix = args.first
-      elsif block_given? then
-        @_prefix = block.call
       else
         @_prefix = nil if !defined?( @_prefix )
       end
@@ -43,8 +41,6 @@ module Envolve
     def self.key_separator( *args, &block )
       if args.size > 0 then
         @_key_separator = args.first
-      elsif block_given? then
-        @_key_separator = block.call
       else
         @_key_separator = '_'.freeze if !defined?( @_key_separator )
       end
