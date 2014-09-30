@@ -5,9 +5,51 @@ module Envolve
   # the elements in that hash via methods.
   #
   # You can also tell it to only pull those items from the initial has that have
-  # a particular prefix
+  # a particular prefix, and that prefix will be stripped off of the elements
+  # for access.
   class Config
-    DEFAULT_KEY_SEPARATOR = '_'.freeze
+    # Public: Return the default environment.
+    #
+    # Override this to return a different environment source
+    def self.environment_source( *args, &block )
+      if args.size > 0 then
+        @_default_env = args.first
+      elsif block_given? then
+        @_default_env = block.call
+      else
+        @_default_env ||= ENV.to_hash
+      end
+    end
+
+    # Public: Return the prefix to be used by the class
+    #
+    # Override this to return a different prefix, or meta program it in an
+    # inherited class.
+    def self.prefix( *args, &block )
+      if args.size > 0 then
+        @_prefix = args.first
+      elsif block_given? then
+        @_prefix = block.call
+      else
+        @_prefix = nil if !defined?( @_prefix )
+      end
+      @_prefix
+    end
+
+    # Public: Return the key_separator to be used by the class
+    #
+    # Override this to return a different key_separator, or meta program it in an
+    # inherited class.
+    def self.key_separator( *args, &block )
+      if args.size > 0 then
+        @_key_separator = args.first
+      elsif block_given? then
+        @_key_separator = block.call
+      else
+        @_key_separator = '_'.freeze if !defined?( @_key_separator )
+      end
+      @_key_separator
+    end
 
     # Internal: The internal hash holding all the keys and values
     attr_reader :env
@@ -19,7 +61,8 @@ module Envolve
     attr_reader :key_separator
 
     # Public: Create a new Config
-    def initialize( env: ENV, prefix: nil, key_separator: DEFAULT_KEY_SEPARATOR )
+    def initialize( env: self.class.environment_source, prefix: self.class.prefix,
+                   key_separator: self.class.key_separator )
       @key_separator = key_separator
       @env = downcase_keys( env )
       if @prefix = prefix then
@@ -77,7 +120,7 @@ module Envolve
     # the following will be under 'rest'
     #
     # Returns the regex
-    def prefix_regex( prefix, key_separator )
+    def prefix_regex( prefix, key_separator  )
       /\A(?<prefix>#{prefix}[#{key_separator}]*)(?<rest>.*)\Z/i
     end
 
@@ -88,7 +131,7 @@ module Envolve
     #
     # All the keys that match the prefix will have hte prefix stripped off. All
     # others will be ignored
-    def filter_by_prefix( in_hash, pre = prefix, ks = key_separator )
+    def filter_by_prefix( in_hash, pre = self.prefix, ks = self.key_separator )
       out_hash = {}
       matcher  = prefix_regex( pre, ks )
       in_hash.each do |key, value|
