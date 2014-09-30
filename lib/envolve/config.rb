@@ -111,6 +111,18 @@ module Envolve
     end
     alias to_hash to_h
 
+    # Public: Return a hash of the keys and values with the keys as symbols.
+    #
+    # Returns a Hash
+    def to_symbolized_h
+      h = {}
+      env.each do |key, value|
+        h[key.to_sym] = value
+      end
+      return h
+    end
+    alias to_symbolized_hash to_symbolized_h
+
     # Internal: This is how we convert method calls into key lookups in the
     # internal hash.
     def method_missing( method, *args, &block )

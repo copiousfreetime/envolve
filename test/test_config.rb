@@ -36,4 +36,9 @@ class TestConfig < ::Minitest::Test
     assert_equal( { 'test_1' => 'test-1', 'test_2' => 'test-2' }, @config.config_with_prefix( 'ev' ).to_h )
   end
 
+  def test_symbolized_h
+    assert_equal( { test_1: 'test-1', test_2: 'test-2' }, @config.config_with_prefix( 'ev' ).to_symbolized_hash )
+
+  end
+
 end
