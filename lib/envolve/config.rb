@@ -17,8 +17,9 @@ module Envolve
       elsif block_given? then
         @_default_env = block.call
       else
-        @_default_env ||= ENV.to_hash
+        @_default_env = ENV unless defined?( @_default_env )
       end
+      @_default_env.to_h
     end
 
     # Public: Return the prefix to be used by the class
@@ -29,7 +30,7 @@ module Envolve
       if args.size > 0 then
         @_prefix = args.first
       else
-        @_prefix = nil if !defined?( @_prefix )
+        @_prefix = nil unless defined?( @_prefix )
       end
       @_prefix
     end
@@ -42,7 +43,7 @@ module Envolve
       if args.size > 0 then
         @_key_separator = args.first
       else
-        @_key_separator = '_'.freeze if !defined?( @_key_separator )
+        @_key_separator = '_'.freeze unless defined?( @_key_separator )
       end
       @_key_separator
     end
