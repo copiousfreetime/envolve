@@ -1,25 +1,24 @@
 require 'test_helper'
 require 'envolve/config'
 
-class PropertyConfig < ::Envolve::Config
-  environment_source {
-    {
-      'EV_TEST_1' => 'test-1',
-      'EV_TEST_2' => 'test-2',
-      'EV_FOO'    => 'test-bar',
-      'EV_WIBBLE' => 'wobble',
-    }
-  }
-
-  prefix 'ev'
-
-  property 'bar',    :key => 'foo'
-  property 'wibble', :value => lambda { |val| val.gsub('o', 'ee') }
-  property 'ara',    :default => 42, :value => lambda { |val| Integer(val) }
-
-end
-
 class TestPropertyConfig < ::Minitest::Test
+  class PropertyConfig < ::Envolve::Config
+    environment_source {
+      {
+        'EV_TEST_1' => 'test-1',
+        'EV_TEST_2' => 'test-2',
+        'EV_FOO'    => 'test-bar',
+        'EV_WIBBLE' => 'wobble',
+      }
+    }
+
+    prefix 'ev'
+
+    property 'bar',    :key => 'foo'
+    property 'wibble', :value => lambda { |val| val.gsub('o', 'ee') }
+    property 'ara',    :default => 42, :value => lambda { |val| Integer(val) }
+
+  end
 
   class PropertyMustConfig < ::Envolve::Config
     property 'envolve_test_must',   :required => true
@@ -33,7 +32,6 @@ class TestPropertyConfig < ::Minitest::Test
   def setup
     @config = PropertyConfig.new
   end
-
 
   def test_access_key_as_method
     assert_equal( 'test-1', @config.test_1 )
