@@ -20,6 +20,16 @@ class PropertyConfig < ::Envolve::Config
 end
 
 class TestPropertyConfig < ::Minitest::Test
+
+  class PropertyMustConfig < ::Envolve::Config
+    property 'envolve_test_must',   :required => true
+  end
+
+  class PrefixPropertyMustConfig < ::Envolve::Config
+    prefix 'envolve_test'
+    property 'required_property',   :required => true
+  end
+
   def setup
     @config = PropertyConfig.new
   end
@@ -50,4 +60,26 @@ class TestPropertyConfig < ::Minitest::Test
     assert_equal( 42, @config['ara'] )
   end
 
+
+  def test_required_property
+    assert_raises(::Envolve::MissingPropertyError) {
+      PropertyMustConfig.new
+    }
+  end
+
+  def test_required_property_error_message
+    begin
+      PropertyMustConfig.new
+    rescue ::Envolve::MissingPropertyError => e
+      assert_match( /\s+ENVOLVE_TEST_MUST\Z/, e.message )
+    end
+  end
+
+  def test_required_property_error_message_includes_prefix
+    begin
+      PrefixPropertyMustConfig.new
+    rescue ::Envolve::MissingPropertyError => e
+      assert_match( /\s+ENVOLVE_TEST_REQUIRED_PROPERTY\Z/, e.message )
+    end
+  end
 end

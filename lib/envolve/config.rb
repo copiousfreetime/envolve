@@ -1,10 +1,11 @@
+require 'envolve/error'
 module Envolve
   # Public: A Configuration class to hold your application configuration
   #
   # Feed it ENV or some other Hash-like object and it will allow you to access
   # the elements in that hash via methods.
   #
-  # You can also tell it to only pull those items from the initial has that have
+  # You can also tell it to only pull those items from the initial hash that have
   # a particular prefix, and that prefix will be stripped off of the elements
   # for access.
   class Config
@@ -60,12 +61,14 @@ module Envolve
     # key      - the source key from the environment where this property comes from
     # value    - the new value for this property
     # default  - setting a default for this property should it not exist
+    # required - this property is required to be set via env. If it is not, an
+    #            execption is raised when the environment is parsed
     #
     # value may also be a lambda, in which ase the lambda is given the original
     # value and the return value from the labmda is used for the new value.
     #
-    def self.property( property, key: nil, value: nil, default: nil )
-      properties[property] = { :key => key, :value => value, :default => default }
+    def self.property( property, key: nil, value: nil, default: nil, required: false )
+      properties[property] = { :key => key, :value => value, :default => default, :required => required }
     end
 
     # Internal: Return the hash holding the properties
@@ -107,6 +110,7 @@ module Envolve
 
     # Internal: Transform the environment variables to propreties
     #
+    # Raises MissingPropertyError if the property is required
     # Returns the transformed hash
     def transform_properties( env, properties )
       transformed = env.to_h.dup
@@ -117,6 +121,7 @@ module Envolve
         if value = transformed.delete(src_key) then
           value = apply_transformation(value, trans[:value]) if trans[:value]
         elsif value.nil? then
+          ::Envolve::MissingPropertyError.raise(_prefix, src_key) if trans[:required]
           value = trans[:default] if trans[:default]
         end
         transformed[dest_key] = value

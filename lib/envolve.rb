@@ -6,4 +6,5 @@ module Envolve
   end
 end
 require 'envolve/version'
+require 'envolve/error'
 require 'envolve/config'
