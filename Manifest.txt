@@ -6,6 +6,7 @@ README.md
 Rakefile
 lib/envolve.rb
 lib/envolve/config.rb
+lib/envolve/error.rb
 lib/envolve/version.rb
 tasks/default.rake
 tasks/this.rb
