@@ -51,7 +51,7 @@ module Envolve
 
     # Public: Set a property, with possible transformations
     #
-    # In the conversion of a the environment to the configuration properties
+    # In the conversion of the environment to the configuration properties
     # sometimes the keys and/or values need to be converted to a new name.
     #
     # All property transformations take place AFTER the initial keys have been downcased
@@ -60,7 +60,8 @@ module Envolve
     # property - the name of the property we want to appear in the configuration
     # key      - the source key from the environment where this property comes from
     # value    - the new value for this property
-    # default  - setting a default for this property should it not exist
+    # default  - setting a default for this property should the environment not
+    #            provide a value
     # required - this property is required to be set via env. If it is not, an
     #            execption is raised when the environment is parsed
     #
@@ -78,7 +79,7 @@ module Envolve
       @_properties ||= Hash.new
     end
 
-    # Internal: The internal hash holding all the keys and values
+    # Internal: The internal hash like item holding all the keys and values
     attr_reader :_env
 
     # Internal: The prefix to strip off all the keys
