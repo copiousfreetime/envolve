@@ -58,8 +58,14 @@ class TestPropertyConfig < ::Minitest::Test
     assert_equal( 42, @config['ara'] )
   end
 
-
   def test_required_property
+    env = ENV.to_hash.dup.merge( 'ENVOLVE_TEST_MUST' => "here" )
+    c = PropertyMustConfig.new( env: env )
+    assert_equal( "here", c.envolve_test_must )
+  end
+
+
+  def test_required_property_raises_missing
     assert_raises(::Envolve::MissingPropertyError) {
       PropertyMustConfig.new
     }
@@ -80,4 +86,5 @@ class TestPropertyConfig < ::Minitest::Test
       assert_match( /\s+ENVOLVE_TEST_REQUIRED_PROPERTY\Z/, e.message )
     end
   end
+
 end
